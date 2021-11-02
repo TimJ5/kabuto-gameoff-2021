@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://kabuto-gameoff-2021/Scenes/Player.tscn" type="PackedScene" id=1]
+
+[node name="Main" type="Node2D"]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
+polygon = PoolVector2Array( 1022.38, 544.783, 1092.94, 546.043, 1099.24, -95.257, -73.7489, -93.9971, -76.2688, 539.743, -0.673523, 538.483, 6.88602, 4.27675, 1027.42, 6.79659 )
+
+[node name="CollisionPolygon2D2" type="CollisionPolygon2D" parent="StaticBody2D"]
+polygon = PoolVector2Array( -0.673523, 539.743, 0.586426, 598.959, 1022.38, 603.999, 1022.38, 546.043, 830.874, 543.523, 824.575, 375.953, 612.908, 367.134, 606.608, 533.444 )
+
+[node name="Player" parent="." instance=ExtResource( 1 )]
+position = Vector2( 141.111, 469.951 )
