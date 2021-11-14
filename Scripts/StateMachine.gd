@@ -16,6 +16,13 @@ func _ready():
 	add_state("wall")
 	call_deferred("set_state", states.idle)
 
+func _input(event):
+	#Basic Jump
+	if event.is_action_pressed("jump") and parent.air_jumps > 0:
+		parent.velocity.y -= parent.jump_strength
+		parent.air_jumps -= 1
+		
+
 func _physics_process(delta):
 	if state != null:
 		_state_logic(delta)
@@ -24,10 +31,44 @@ func _physics_process(delta):
 			set_state(trans)
 
 func _state_logic(delta):
-	pass
+	parent._handle_move_input()
+	parent._apply_gravity(delta)
+	parent._apply_movement()
+
 	
 func _get_transition(delta):
-	return null
+	match state:
+		states.idle:
+			if !parent.is_on_floor():
+				if parent.velocity.y < 0:
+					return states.jump
+				elif parent.velocity.y > 0:
+					return states.fall
+			elif parent.velocity.x != 0:
+				return states.run
+		
+		states.run:
+			if !parent.is_on_floor():
+				if parent.velocity.y < 0:
+					return states.jump
+				elif parent.velocity.y > 0:
+					return states.fall
+			elif parent.velocity.x == 0:
+				return states.idle
+		
+		states.jump:
+			if parent.is_on_floor():
+				parent.air_jumps = parent.max_air_jumps
+				return states.idle
+			elif parent.velocity.y >= 0:
+				return states.fall
+		
+		states.fall:
+			if parent.is_on_floor():
+				parent.air_jumps = parent.max_air_jumps
+				return states.idle
+			elif parent.velocity.y < 0:
+				return states.jump
 	
 func _enter_state(new_state, old_state):
 	pass
