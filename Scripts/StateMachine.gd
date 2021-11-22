@@ -18,10 +18,15 @@ func _ready():
 
 func _input(event):
 	#Basic Jump
-	if event.is_action_pressed("jump") and parent.air_jumps > 0:
-		parent.velocity.y -= parent.jump_strength
-		parent.air_jumps -= 1
-		
+	if [states.idle, states.run, states.jump, states.fall].has(state):
+		if event.is_action_pressed("jump") and parent.air_jumps > 0:
+			parent.velocity.y -= parent.jump_strength
+			parent.air_jumps -= 1
+	
+	elif state == states.wall:
+		if event.is_action_pressed("jump"):
+			parent.apply_wall_jump()
+			set_state(states.jump)
 
 func _physics_process(delta):
 	if state != null:
@@ -31,7 +36,10 @@ func _physics_process(delta):
 			set_state(trans)
 
 func _state_logic(delta):
-	parent._handle_move_input()
+	parent._update_move_direction()
+	parent._update_wall_direction()
+	if state != states.wall:
+		parent._handle_move_input()
 	parent._apply_gravity(delta)
 	parent._apply_movement()
 
@@ -57,18 +65,28 @@ func _get_transition(delta):
 				return states.idle
 		
 		states.jump:
-			if parent.is_on_floor():
+			if parent.wall_direction != 0:
+				return states.wall
+			elif parent.is_on_floor():
 				parent.air_jumps = parent.max_air_jumps
 				return states.idle
 			elif parent.velocity.y >= 0:
 				return states.fall
 		
 		states.fall:
-			if parent.is_on_floor():
+			if parent.wall_direction != 0:
+				return states.wall
+			elif parent.is_on_floor():
 				parent.air_jumps = parent.max_air_jumps
 				return states.idle
 			elif parent.velocity.y < 0:
 				return states.jump
+				
+		states.wall:
+			if parent.is_on_floor():
+				return states.idle
+			elif parent.wall_direction == 0:
+				return states.fall
 	
 func _enter_state(new_state, old_state):
 	pass
@@ -87,3 +105,18 @@ func set_state(new_state):
 		
 func add_state(state_name):
 	states[state_name] = states.size()
+
+func get_state():
+	match state:
+		states.idle:
+			return "Idle"
+		states.run:
+			return "Run"
+		states.jump:
+			return "Jump"
+		states.fall:
+			return "Fall"
+		states.attack:
+			return "Attack"
+		states.wall:
+			return "Wall"

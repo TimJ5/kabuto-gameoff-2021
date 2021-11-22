@@ -12,4 +12,4 @@ func _ready():
 
 
 func _physics_process(delta):
-	$Label.text = "FPS: " + str(Engine.get_frames_per_second()) + "\nAir Jumps: " + str($Player.air_jumps)
+	$DebugLabel.text = "FPS: " + str(Engine.get_frames_per_second()) + "\nAir Jumps: " + str($Player.air_jumps) + "\nPlayer State: " + str($Player/StateMachine.get_state()) + "\nWall Direction: " + str($Player.wall_direction)
